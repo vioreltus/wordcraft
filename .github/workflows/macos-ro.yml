@@ -25,14 +25,25 @@ jobs:
         run: |
           rustup toolchain install stable --profile minimal --target x86_64-apple-darwin
           rustup default stable
+      - name: Cap the Metal shading language on OpenCore Legacy Patcher Macs
+        run: |
+          cargo fetch --locked
+          src=$(ls -d ~/.cargo/registry/src/*/wgpu-hal-30.0.1 | head -1)
+          cp -R "$src" ../wgpu-hal
+          python3 .github/ocl-patch.py ../wgpu-hal
+          mkdir -p ../.cargo
+          printf '[patch.crates-io]\nwgpu-hal = { path = "%s" }\n' "$GITHUB_WORKSPACE/../wgpu-hal" > ../.cargo/config.toml
+          perl -pi -e 's/cargo build --release --locked/cargo build --release/' packaging/macos/package.sh
       - name: Build and package (Intel, ad-hoc signed)
         run: packaging/macos/package.sh --arch x86_64
       - name: Publish
         env:
+          VER: "0.13.2"
           GH_TOKEN: ${{ github.token }}
         run: |
           ls -l dist/release
-          gh release create macos-ro-0.13.2 --target "$GITHUB_SHA" --prerelease \
+          gh release delete "macos-ro-$VER" --cleanup-tag -y || true
+          gh release create "macos-ro-$VER" --target "$GITHUB_SHA" --prerelease \
             --title "WordCraft 0.13.2-ro macOS Intel (build neoficial)" \
             --notes "Build neoficial pentru Mac Intel, cu reparatiile pentru romana. Nesemnat: la prima pornire click dreapta pe aplicatie -> Open." \
             dist/release/*.dmg dist/release/*.zip
