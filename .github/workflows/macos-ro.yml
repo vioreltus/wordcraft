@@ -1,0 +1,38 @@
+# Unofficial macOS build of the Romanian fixes (vioreltus fork only).
+name: macOS build (ro)
+on:
+  push:
+    branches: [build/macos-ro]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 240
+    env:
+      CRAFT_FONTS_DIR: ${{ github.workspace }}/../craft-fonts
+      CRAFT_I18N_DIR: ${{ github.workspace }}/../craft-i18n
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build inputs
+        run: |
+          git clone https://github.com/storytold/craft-fonts ../craft-fonts
+          git -C ../craft-fonts checkout 3d9ab3a132ed0eff457e424226a435a901da30d3
+          git clone https://github.com/storytold/craft-i18n ../craft-i18n
+          git -C ../craft-i18n checkout 19358491340b9f33d618673de6bcd40108d9a775
+      - name: Rust
+        run: |
+          rustup toolchain install stable --profile minimal --target x86_64-apple-darwin
+          rustup default stable
+      - name: Build and package (Intel, ad-hoc signed)
+        run: packaging/macos/package.sh --arch x86_64
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -l dist/release
+          gh release create macos-ro-0.13.2 --target "$GITHUB_SHA" --prerelease \
+            --title "WordCraft 0.13.2-ro macOS Intel (build neoficial)" \
+            --notes "Build neoficial pentru Mac Intel, cu reparatiile pentru romana. Nesemnat: la prima pornire click dreapta pe aplicatie -> Open." \
+            dist/release/*.dmg dist/release/*.zip
