@@ -1,9 +1,9 @@
 # Installing spelling dictionaries
 
-> **Last reviewed:** 2026-10-16 · **Last updated:** 2026-10-23 · **Change:** minor (ISO 8859-9 Turkish dictionaries are read, #3692; previously minor: Spanish: `es_ES`, `es_MX`, `es_419` and `es_UY` with their fallbacks, #3360, #3553; previously trivial: every Hunspell language shows (no dictionary), not only Polish and Portuguese, and Indonesian is listed, #3150; previously trivial: ISO 8859-1 dictionaries are read, #2824)
+> **Last reviewed:** 2026-10-16 · **Last updated:** 2026-10-26 · **Change:** trivial (how to install the Romanian dictionary on Windows and Ubuntu; previously minor: Romanian added; previously minor: ISO 8859-9 Turkish dictionaries are read, #3692; previously minor: Spanish: `es_ES`, `es_MX`, `es_419` and `es_UY` with their fallbacks, #3360, #3553; previously trivial: every Hunspell language shows (no dictionary), not only Polish and Portuguese, and Indonesian is listed, #3150; previously trivial: ISO 8859-1 dictionaries are read, #2824)
 
 English spelling works out of the box. Polish, Russian, Portuguese, Czech, Italian, Croatian,
-Turkish, Indonesian and Spanish spelling use a standard **Hunspell** dictionary (an `.aff` and a `.dic` file) that
+Turkish, Indonesian, Spanish and Romanian spelling use a standard **Hunspell** dictionary (an `.aff` and a `.dic` file) that
 WordCraft reads at runtime. These dictionaries are not bundled: they are large, and several are
 GPL or LGPL licensed. Without one, the language isn't checked. The status bar then shows the
 language with **(no dictionary)**, for example *Português (Brasil) (no dictionary)*.
@@ -34,6 +34,7 @@ WordCraft looks for the first of these file names (each name means a `<name>.aff
 | Spanish (Mexico) | `es_MX`, `es-MX`, `es_419`, `es-419`, `es_ANY`, `es` | LibreOffice `dict-es` (RLA-ES) |
 | Spanish (Latin America, and the other Spanish regions of the Americas) | `es_419`, `es-419`, `es_ANY`, `es`, `es_US`, `es_MX`, `es_AR`, `es-AR` | LibreOffice `dict-es` (RLA-ES) |
 | Spanish (Uruguay) | `es_UY`, `es-UY`, `es_AR`, `es-AR`, `es_419`, `es-419`, `es_ANY`, `es` | LibreOffice `dict-es` (RLA-ES) |
+| Romanian (Romania and Moldova) | `ro_RO`, `ro-RO`, `ro_MD`, `ro` | rospell (LibreOffice `dict-ro`; repository folder `ro`) |
 
 Every Portuguese region uses the same `pt_BR` dictionary, so text marked *Português (Portugal)*
 is checked with it too.
@@ -119,6 +120,26 @@ Other languages work the same way: replace `pt_BR` with the language's folder an
 from the LibreOffice repository (for example `it_IT/it_IT.aff`; the Spanish ones are all in
 `es/`, for example `es/es_MX.aff`).
 
+## Example: Romanian (`ro_RO`)
+
+Rospell, the Romanian dictionary LibreOffice ships (GPL / LGPL / MPL), is in the
+[LibreOffice dictionaries repository](https://github.com/LibreOffice/dictionaries/tree/master/ro),
+in the folder `ro` (not `ro_RO`). If LibreOffice is installed, WordCraft finds its `dict-ro`
+extension on its own.
+
+On Windows, in PowerShell:
+
+```powershell
+$d = "$env:LOCALAPPDATA\WordCraft\dictionaries"
+New-Item -ItemType Directory -Force $d | Out-Null
+$base = "https://raw.githubusercontent.com/LibreOffice/dictionaries/master/ro"
+Invoke-WebRequest "$base/ro_RO.aff" -OutFile "$d\ro_RO.aff" -UseBasicParsing
+Invoke-WebRequest "$base/ro_RO.dic" -OutFile "$d\ro_RO.dic" -UseBasicParsing
+```
+
+On Debian and Ubuntu, `sudo apt install hunspell-ro`. Restart WordCraft; with the Romanian
+interface, new documents are written in Romanian and checked as you type.
+
 ## Checking that it works
 
 - Restart WordCraft. The status bar no longer says **(no dictionary)**, and a misspelled word
@@ -140,9 +161,11 @@ Never commit dictionary files to this repository: they stay on the user's system
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-26 | trivial | Example: installing the Romanian `ro_RO` (rospell) on Windows and Debian/Ubuntu |
 | 2026-10-22 | minor | Spanish (#3360, #3553): the file names for Spain, Mexico, Latin America and Uruguay and their fallbacks |
 | 2026-10-22 | trivial | Italian, Croatian, Turkish, Russian, Czech and Indonesian without a dictionary now show **(no dictionary)** (or **(dictionary unreadable)**) too, as this page already said; before, only Polish and Portuguese did. Indonesian is listed with its file names (#3150) |
 | 2026-10-23 | trivial | ISO 8859-9 (`SET ISO8859-9`) dictionaries are read, so an older Turkish `tr_TR` loads without converting it to UTF-8; the Turkish dictionary is read through the same size-capped reader and `SET` decoding as the others (#3692) |
 | 2026-10-18 | trivial | ISO 8859-1 (`SET ISO8859-1`) dictionaries are read, so the original VERO `pt_BR` works without converting it to UTF-8 (#2824) |
 | 2026-10-18 | minor | An installed dictionary that can't be read shows **(dictionary unreadable)** in the status bar, with the file and reason in its tooltip and in File › Options › Proofing (#2830) |
+| 2026-10-18 | trivial | Romanian (`ro_RO`, rospell) added to the languages and file names |
 | 2026-10-16 | major | First version: the file names per language, the search order and folders on Windows, macOS and Linux, installing `pt_BR` on each, and how to check it works |
