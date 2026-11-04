@@ -614,7 +614,7 @@ fn main() -> eframe::Result {
             let mut session = Session::new(doc);
             session.system_region = region;
             let mut app = WordApp::new(session, services(file_dialog, &cc.egui_ctx));
-            app.set_startup_update_check(true);
+            app.set_startup_update_check(false); // build neoficial: fara verificare la pornire
             load_prefs(&mut app);
             // After the preferences, so the reason it gives is in the interface language.
             if updates_unsafe {
