@@ -89,6 +89,7 @@ pub fn submit() -> Submit {
                     Duplex::Off => craft_print::Duplex::Off,
                 }),
                 grayscale: settings.grayscale,
+                grey_pages: false,
                 scaling: craft_print::Scaling::ShrinkToFit,
                 title: "WordCraft document".into(),
                 options,

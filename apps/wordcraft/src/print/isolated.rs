@@ -68,6 +68,7 @@ impl Request {
                 Duplex::ShortEdge => craft_print::Duplex::ShortEdge,
             }),
             grayscale: self.grayscale,
+            grey_pages: false,
             scaling: if self.shrink { craft_print::Scaling::ShrinkToFit } else { craft_print::Scaling::Exact },
             title: self.title,
             options: self.options,
